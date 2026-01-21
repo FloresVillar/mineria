@@ -95,7 +95,37 @@ Parsimonia esta codificada en BIC , penalizacion BIC = k log n
 
 Para concluir , la funcion fase4() crea un data frame mediante pandas para observar la indo de auerdo al menor BIC, quien nos brinda la info de que columnas brindan mayor verosimilitud dado una complejidad.
 
- 
+## SKLEARN
+Todo lo anterior se hara via las funciones de las librerias(libreria?) Sklearn.
+```bash
+datos = fetch_california_housing()
+X = datos.data
+y = datos.target
+escalador = StandardScaler()  # calculará las u y sigma, transformara (== normalizacion)
+# entrada X E R^(n * m)  salida lo mismo
+X_std = escalador.fit_transform(X)
+regresor = LinearRegression() # es solo el modelo de regresion lineal
+EFS = ExhaustiveFeatureSelector(lr, min_features=1,max_features=5,scoring)
+# selecciona las columnas en forma de tuplas, pero tambien calcula MSE, aunque no guarda los theta's , == subconjuntos
+EFS.fit(X_std,y) # tenemos dichas columnas
+# ahora recorremos los elementos de subset_ mediante subsets_.values()
+resultados =  [] # ==fase3
+for subset in efs.subsets_.values():
+    cols = subset['feature_idx']  # es una tupla ej: (0,2,5)
+    X_sub = X_std[:,cols] # == X_1() ,slicing admite tuplas, entra R^(n*8) sale R^(n*cols)
+    lr.fit(X_sub,y)  # entrenamos cada subconjunto == regresion(Xs,y)
+    y_pred = lr.predict(X_sub) # lo veo redundante
+    n = len(y)     # == metricas
+    k = X_sub.shape[1] + 1
+    MSE = np.mean((y - y_pred)**2)
+    AIC = 2*k + n*log(MSE)
+    BIC = k*np.log(n) + n*log(MSE)
+    resultados.append({"columnas":cols,"AIC":AIC,"BIC":BIC})
+tabla = pd.DataFrame(resultados) #==fase4
+tabla = tabla.sort_values("BIC")
+print(tabla)
+```
+
 
  
 
