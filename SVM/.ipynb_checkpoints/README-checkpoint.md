@@ -12,6 +12,34 @@ min **||w||^2 / 2** sujeto a   **yi(wx*i + b) >=1** , promagramacion cuadratica 
 
 5. Primal , langrangiano
 **L(w , b, lam) = |w|^2 / 2 - SUMA li(yi(wixi + b)-1)** con **li>=0**
-   
+<p align="center">
+    <img src="imagenes/0.png" width="75%">
+</p>
+
+a
+<p align="center">
+    <img src="imagenes/1.png" width="75%">
+</p>
+a
+<p align="center">
+    <img src="imagenes/2.png" width="75%">
+</p>
+a
+
+<p align="center">
+    <img src="imagenes/3.png" width="75%">
+</p>
+a
+<p align="center">
+    <img src="imagenes/lagrange.png" width="75%">
+</p>
+
+Derivando el lagrangiano se obtiene (como lo indica la figura) 
+delta L/ delta w = w -SUMA liyixi =  0   →  w = SUMA li yi xi <br>
+delta L /delta l = SUMA yi (wi xi)  -1 = 0   <br>
+delta L / delta b = SUMA li yi = 0 
+
+Para el primal se reemplaza estos
+
 ```bash
 ```
