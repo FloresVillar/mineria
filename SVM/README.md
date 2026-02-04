@@ -78,3 +78,30 @@ Sin duda gpt es un gran amigo
 
 Entonces la se optimiza lo mismo que en el caso hard , pero con otras restricciones. En este punto cabe aclarar el C como termino de "penalizacion" de los errores. Si C → inf el modelo castiga los errores, evita violaciones, pero si son datos separales Ei = 0.<br>
 como se quiere minimizar y C es grande lo unico que queda es que Ei=0<br>
+
+
+## El ejercicio de la clase
+<p align="center">
+    <img src="imagenes/ejemplo.png" width="75%">
+</p>
+
+<p align="center">
+    <img src="imagenes/ejemplo2.png" width="75%">
+</p>
+
+Como este ejercicio parece una tanto distinto a la codificacion hecha, gemini ayudó a aclarar algunos conceptos. 
+```bash
+la frontera de desicion es :
+f(x) = w . phi(x) + b
+pero en el ejercicio  b esta metido dentro de phi , por eso los vectores tienen un 1 al final.  , quedando la formula simplemente como 
+f(x) = w . phi(x)
+w = a1.phi(S1) + a2.phi(S2) + a3.phi(S3)
+# acerca de los signos de yj, ya estan absorbidos en el valor final de los alpha
+
+luego si queremos que S1 este en el margen
+f(S1) = w . phi(S1) = -1
+      = [a1.phi(S1) + a2.phi(S2) + a3.phi(S3) ].phi(S1) = -1
+    = a1 phi(S1).phi(S1) + a2 phi(S2).phi(S1) + a3 phi(S3).phi(S1)=-1
+```
+Luego lo mismo para S2 y S3
+
