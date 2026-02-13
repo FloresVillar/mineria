@@ -1,0 +1,106 @@
+﻿<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+<style type="text/css">
+<!--
+.Estilo18 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #000000;
+}
+.Estilo20 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+-->
+</style>
+<div align="center" class="Estilo1">
+  <TABLE width="644" border="0" cellspacing="0" background="s805_archivos/cubito.jpg">
+    <!--DWLayoutTable-->
+    <TBODY>
+      <TR>
+        <TD width="14" height="505">&nbsp;</TD>
+        <TD width="614" rowspan="2" valign="top" class="text">
+          <P align="center"> <SPAN class="header">              <span class="Estilo20">Ejemplo de Clustering K-Means</span></SPAN></P>
+          <P align="justify" class="Estilo18">El proceso de agrupamiento k-means es simple, Inicialmente se determina el número de grupos K y se asume el centroide o centro de esos grupos. Para determinar los centroides hay dos alternativas prácticas: la primera es tomar de forma aleatoria K objetos como centroides iniciales y la segunda es tomar los primeros K objetos en secuencia. </P>
+          <P class="Estilo18">Luego el algoritmo ejecuta los siguientes tres pasos hasta que alcance el criterio de convergencia, es decir que los objetos no se muevan de grupo. </P>
+          <OL class="Estilo18">
+            <LI>Se determina el o los centroides iniciales de acuerdo al número de cluster esperado. </LI>
+            <LI>Se determina la distancia de cada objeto con relación a los centroides </LI>
+            <LI>Se agrupan los objetos con base en la distancia mínima. </LI>
+          </OL>
+          <P align="center" class="Estilo18"><IMG width="464" height="420" alt="Ejemplo Numerico" 
+      src="k-means_archivos/EjemploNumerico_clip_image002.gif"></P>
+          <P class="Estilo18">&nbsp; </P>
+          <P class="Estilo18">El ejemplo numérico mostrado a continuación es dado para entender una simple iteración. </P>
+          <P class="Estilo18">Supóngase que se tienen cuatro tipos de medicina con dos atributos (peso e índice PH) como se muestra en la siguiente tabla: </P>
+          <P class="Estilo18">&nbsp; </P>
+          <TABLE cellspacing="0" cellpadding="0">
+            <TBODY>
+              <TR>
+                <TD width="138" valign="top" class="Estilo18">                  <P align="center"><STRONG>MEDICINA </STRONG></P></TD>
+                <TD width="136" valign="top" class="Estilo18">                  <P align="center"><STRONG>PESO </STRONG></P></TD>
+                <TD width="180" valign="top" class="Estilo18">                  <P align="center"><STRONG>ÍNDICE PH </STRONG></P></TD>
+              </TR>
+              <TR>
+                <TD width="138" valign="top" class="Estilo18">                  <P align="center">A </P></TD>
+                <TD width="136" valign="top" class="Estilo18">                  <P align="center">1 </P></TD>
+                <TD width="180" valign="top" class="Estilo18">                  <P align="center">1 </P></TD>
+              </TR>
+              <TR>
+                <TD width="138" valign="top" class="Estilo18">                  <P align="center">B </P></TD>
+                <TD width="136" valign="top" class="Estilo18">                  <P align="center">2 </P></TD>
+                <TD width="180" valign="top" class="Estilo18">                  <P align="center">1 </P></TD>
+              </TR>
+              <TR>
+                <TD width="138" valign="top" class="Estilo18">                  <P align="center">C </P></TD>
+                <TD width="136" valign="top" class="Estilo18">                  <P align="center">4 </P></TD>
+                <TD width="180" valign="top" class="Estilo18">                  <P align="center">3 </P></TD>
+              </TR>
+              <TR>
+                <TD width="138" valign="top" class="Estilo18">                  <P align="center">D </P></TD>
+                <TD width="136" valign="top" class="Estilo18">                  <P align="center">5 </P></TD>
+                <TD width="180" valign="top" class="Estilo18">                  <P align="center">4 </P></TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+          <P class="Estilo18">&nbsp; </P>
+          <P class="Estilo18">Cada medicina puede ser representada como un punto en un espacio coordenado: </P>
+          <P class="Estilo18">&nbsp; </P>
+          <P align="center" class="Estilo18"><IMG width="343" height="235" alt="Ejemplo Numerico" 
+      src="k-means_archivos/EjemploNumerico_clip_image004.gif"></P>
+          <P class="Estilo18">•&nbsp; <EM>Valor inicial de los centroides: </EM>Sean C1 y C2 los centroides de los k-grupos. Si se eligen las medicinas A y B como los primeros centroides que quedan en los puntos (1,1) y (2,1). </P>
+          <P align="center" class="Estilo18"><IMG width="343" height="235" alt="Ejemplo Numerico" 
+      src="k-means_archivos/EjemploNumerico_clip_image006.gif"></P>
+          <P class="Estilo18">•&nbsp; <EM>Distancia de cada objeto a los centroides: </EM>Se calcula la distancia de cada objeto utilizando la distancia euclidiana <IMG width="182" height="48" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image008.gif">, así por ejemplo la distancia entre la medicina C (4,3) y el primer centroide (1,1,) es <IMG width="157" height="23" alt="Ejemplo Numerico" 
+      src="k-means_archivos/EjemploNumerico_clip_image010.gif">, y su distancia con el segundo centroide (2,1) es <IMG width="167" height="23" 
+      alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image012.gif">. Resultando en la primera iteración la siguiente matriz de distancias: </P>
+          <P class="Estilo18"><IMG width="202" height="43" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image014.gif"></P>
+          <P class="Estilo18">•&nbsp; <EM>Agrupación: </EM>Se asigna entonces cada objeto a cada grupo teniendo en cuenta el mínimo error de partición de cada elemento en cada grupo, entonces la medicina A se asigna al grupo 1 (con centroide en (1,1)) y las medicinas B, C y D al grupo 2 (con centroide en (2,1)). </P>
+          <P class="Estilo18"><IMG width="122" height="43" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image016.gif"></P>
+          <P class="Estilo18">•&nbsp; <EM>Iteración 1, determinar centroides: </EM>Conociendo los miembros de los grupos, se vuelve a calcular el centroide de cada grupo y la matriz de distancias. Como el grupo 1 tiene sólo un miembro el centroide de ese grupo permanece en (1,1). El grupo 2 tiene ahora 3 miembros, por lo que el nuevo centroide es: </P>
+          <P class="Estilo18"><IMG width="219" height="39" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image018.gif">. </P>
+          <P align="center" class="Estilo18"><IMG width="381" height="265" alt="Ejemplo Numerico" 
+      src="k-means_archivos/EjemploNumerico_clip_image020.jpg"></P>
+          <P class="Estilo18">•&nbsp; <EM>Iteración 1, Distancia de los objetos a los centroides: </EM>Nuevamente se calculan la distancia para todos los objetos con base en los nuevos centroides, similar al paso 2. Obteniendo las siguiente matriz de distancias: </P>
+          <P class="Estilo18"><IMG width="201" height="43" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image022.gif"><br>
+            <br>
+          •&nbsp; <EM>Iteración 1, Agrupación de Objetos: </EM>Similar al paso 3, se asigna nuevamente cada objeto a cada grupo teniendo en cuenta el mínimo error de partición de cada elemento en cada grupo, entonces ahora las medicinas A y B quedan asignadas al grupo 1 (con centroide en 1,1) y las medicinas C y D al grupo 2 (con centroide en 11/3,8/3). </P>
+          <P class="Estilo18"><IMG width="118" height="43" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image024.gif"></P>
+          <P class="Estilo18">•&nbsp; <EM>Iteración 2, determinación de Centroides: </EM>Repitiendo el paso 4, Se recalculan los centroides: </P>
+          <P class="Estilo18"><IMG width="390" height="39" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image026.gif"></P>
+          <P align="center" class="Estilo18"><IMG width="444" height="308" alt="Ejemplo Numerico" 
+      src="k-means_archivos/EjemploNumerico_clip_image028.jpg"></P>
+          <P class="Estilo18">•&nbsp; <EM>Iteración 2, Distancia de los objetos a los Centroides: </EM>Repitiendo el paso 2, Se recalcula la matriz de distancias: </P>
+          <P class="Estilo18"><IMG width="204" height="43" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image030.gif"></P>
+          <P class="Estilo18">•&nbsp; <EM>Iteración 2, Agrupación de Objetos: </EM>Nuevamente se asignan los objetos en cada grupo basado el criterio de mínima distancia: </P>
+          <P class="Estilo18"><IMG width="120" height="43" alt="Ejemplo Numerico" src="k-means_archivos/EjemploNumerico_clip_image032.gif"></P>
+          <P class="Estilo18">Los casos de entrada tendrán bajo esta nueva iteración la misma clasificación, concluyéndose que el cálculo de centroides se ha estabilizado, y no es necesario continuar iterando. <br>
+            <br>
+            </P></TD>
+        <TD width="10" rowspan="2" valign="top"  class="text"><!--DWLayoutEmptyCell-->&nbsp;</TD>
+      </TR>
+      <TR>
+        <TD height="1531">&nbsp;</TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+</div>

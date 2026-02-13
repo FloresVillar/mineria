@@ -430,7 +430,7 @@ finalmente
 ```bash
 Estado   Humedad  Viento  Jugar
 --------------------------------
-Soleado  Alta     Leve    No
+-------  Alta     Leve    No
 Soleado  Alta     Fuerte  No
 Nublado  Alta     Leve    Sí
 Lluvia   Alta     Leve    Sí
@@ -446,5 +446,126 @@ Nublado  Normal   Leve    Sí
 Lluvia   Alta     Fuerte  Sí
 
 la variable objetivo es Jugar = {Sí, No}
+
+Total = 13 
+Si 9 
+no 4
+
+H(S) = -9/13 log 9/13 - 4/13 log4/13 = 0.7793
+
+Ahora para cada atributo 
++----------+----+----+-------+
+| Estado   | Si | No | Total |
++----------+----+----+-------+
+| Soleado  | 2  | 2  |   4   |
+| Nublado  | 4  | 0  |   4   |
+| Lluvia   | 4  | 1  |   5   |
+    ?             1      1
++----------+----+----+-------+
+
+H(S|estado) = 4/14(-2/4log2/4 - 2/4log2/4) + 4/13(-4/4log4/4 - 0/4log0/4) + 5/13(-4/5log4/5 - 1/5log1/5) = 0.58
+Gain(S,Estado) = H(S) - H(S|Estado) = 0.7793- 0.585 = 0.194
+SplitInfo(S,Estado)=−(4/14​log4/14​r+4/14​log4/14​+5/14​log5/14​+1/14​log1/14​) = 1.835
+GainRatio = Gain(S,Estado)/SplitInfo(S,Estado) = 0.194/ 1.835 =0.098
+
++----------+----+----+-------+
+| Humedad  | Si | No | Total |
++----------+----+----+-------+
+| Alta     | 4  | 3  |   7   |
+| Normal   | 6  | 1  |   7   |
++----------+----+----+-------+
+H(S | Humedad) = 7/13 (-4/7 log 4/7 - 3/7log3/7 ) + 7/13 (-6/7log6/7 - 1/7log1/7)  = 0.789
+Gain(S,Humedad) = 0.7793 - 0.789 = -0.0097
+SplitInfo(S,Humedad)=−(7/14​log7/14​+7/14​log7/14​)  = 
+GainRatio = 
+
++----------+----+----+-------+
+| Viento   | Si | No | Total |
++----------+----+----+-------+
+| Leve     | 6  | 2  |   8   |
+| Fuerte   | 4  | 2  |   6   |
++----------+----+----+-------+
+H(S|Viento) = 8/13(-6/8log6/8 - 2/8log2/8) + 6/13(-4/6log4/6 - 2/6log2/6) = 0.860
+Gain(S,Viento)  =  0.7793 - 0.860 = -0.081
+SplitInfo(S,Viento)=−(8/14log8/14​ + 6/14​log6/14​) = 
+GainRatio = 
+
+Estado tiene Gain mayor 
+entonces tenemos 
+
+
+                         [Estado]
+                     /       |        \
+               Soleado     Nublado     Lluvia
+                  |           |           |
+```
+una vez definida el primer nivel 
+
+```bash
+Ahora en las ramas
++----------+----------+--------+--------+------+
+| Estado   | Humedad  | Viento | Juego  | Peso |
++----------+----------+--------+--------+------+
+|    ?     | Alta     | Leve   |  No    | 4/13 |
+| Soleado  | Alta     | Fuerte |  No    |  1   |
+| Soleado  | Alta     | Leve   |  No    |  1   |
+| Soleado  | Normal   | Leve   |  Sí    |  1   |
+| Soleado  | Normal   | Fuerte |  Sí    |  1   |
++----------+----------+--------+--------+------+
+ si   2    no = 1+1+4/13 =30/13
+ total =56/13
+H(S) = -2/56/13 log2/56/13 - 30/13log30/13 = 0.996
+
+humedad : 
+alta : si 4/13 + 1 + 1 = 30/13   no 0
+H = -30/13 log 30/13 - 0log0/30/13
+
+normal :  si 2  no  0
+H = -2/2 log 2/2  - 0 log0 = 0
+
+H(S|humedad) = 30/13 / 56/13  * 0 + 2/56/13 = 0
+Gain(S,humedad) = 0.996
+Es una hoja pues los H son 0's
+
+
+
+Estado    Humedad   Viento   Juego
+----------------------------------
+Nublado   Alta      Leve     Sí
+Nublado   Normal    Fuerte   Sí
+Nublado   Alta      Fuerte   Sí
+Nublado   Normal    Leve     Sí
+
+si 4 no 0  total 4 
+H(s) = -4/4 log 4/4 - 0log0 = 0
+Se para
+
+
+Estado   Humedad   Viento   Juego
+---------------------------------
+Lluvia   Alta      Leve     Sí
+Lluvia   Alta      Fuerte   No
+Lluvia   Normal    Leve     Sí
+Lluvia   Normal    Fuerte  Sí
+Lluvia   Alta      Leve     Sí
+
+si 4  no 1   total 5
+h(S) = -4/5 log 4/5 - 1/5 log 1/5  = 0.722
+
+humedad
+alta : si 2 no 1   
+H = -2/3 log 2/3 - 1/3log1/3  = .....
+
+
+
+                          [Estado]
+                    /         |          \
+              Soleado       Nublado       Lluvia
+                |              |             |
+            [Humedad]         Sí         [Viento]
+            /        \                       /    \
+        Alta        Normal               Leve    Fuerte
+         |             |                   |        |
+        No             Sí                 Sí       Sí
 
 ```

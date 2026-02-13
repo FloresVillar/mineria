@@ -1,3 +1,4 @@
+
 # SVM 
 Resumen de gpt, lo genial es que sintetiza la teoria
 Que se esta haciendo ? <br>
