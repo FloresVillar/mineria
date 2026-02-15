@@ -227,3 +227,311 @@ Garantiza el minimo local, no el global.
 ```
 
 ## Clustering jerarquico
+
+```bash
+========================================================
+CLUSTERING JERÁRQUICO (SINGLE LINKAGE)
+========================================================
+
+PUNTOS
+A = (1,1)
+B = (2,2)
+C = (3,1)
+D = (6,5)
+E = (7,7)
+F = (8,6) 
+
+--------------------------------------------------------
+CLUSTERS INICIALES
+--------------------------------------------------------
+
+{A}   {B}   {C}   {D}   {E}   {F}
+ 
+--------------------------------------------------------
+PASO 1 — MATRIZ COMPLETA DE DISTANCIAS
+--------------------------------------------------------
+
+        A      B      C      D      E      F
+A       -     1.41   2.00   6.40   8.48   8.60
+B             -      1.41   5.00   7.07   7.21
+C                    -      5.00   7.21   7.07
+D                           -      2.23   2.23
+E                                  -      1.41
+F                                         -
+
+MÍNIMA GLOBAL = 1.41  (A-B)
+
+--------------------------------------------------------
+PASO 2 — FUSIONAR A Y B
+--------------------------------------------------------
+
+{A,B}   {C}   {D}   {E}   {F}
+
+Single linkage:
+d({A,B},X) = min(d(A,X), d(B,X))
+
+--------------------------------------------------------
+PASO 3 — NUEVAS DISTANCIAS
+--------------------------------------------------------
+
+{A,B} – C = min(2.00 , 1.41) = 1.41
+{A,B} – D = min(6.40 , 5.00) = 5.00
+{A,B} – E = min(8.48 , 7.07) = 7.07
+{A,B} – F = min(8.60 , 7.21) = 7.21
+
+Matriz reducida:
+
+            {A,B}     C      D      E      F
+{A,B}         -      1.41   5.00   7.07   7.21
+C                     -      5.00   7.21   7.07
+D                            -      2.23   2.23
+E                                   -      1.41
+F                                          -
+
+MÍNIMA GLOBAL = 1.41  ({A,B} - C)
+
+--------------------------------------------------------
+PASO 4 — FUSIONAR {A,B} Y C
+--------------------------------------------------------
+
+{A,B,C}   {D}   {E}   {F}
+
+Single linkage:
+d({A,B,C},X) = min(d(A,X), d(B,X), d(C,X))
+
+--------------------------------------------------------
+PASO 5 — NUEVAS DISTANCIAS
+--------------------------------------------------------
+
+{A,B,C} – D = min(6.40 , 5.00 , 5.00) = 5.00
+{A,B,C} – E = min(8.48 , 7.07 , 7.21) = 7.07
+{A,B,C} – F = min(8.60 , 7.21 , 7.07) = 7.07
+
+Matriz:
+
+            {A,B,C}     D      E      F
+{A,B,C}        -       5.00   7.07   7.07
+D                       -      2.23   2.23
+E                              -      1.41
+F                                     -
+
+MÍNIMA GLOBAL = 1.41  (E-F)
+
+--------------------------------------------------------
+PASO 6 — FUSIONAR E Y F
+--------------------------------------------------------
+
+{A,B,C}   {D}   {E,F}
+
+Single linkage:
+d({E,F},X) = min(d(E,X), d(F,X))
+
+--------------------------------------------------------
+PASO 7 — NUEVAS DISTANCIAS
+--------------------------------------------------------
+
+D – {E,F} = min(2.23 , 2.23) = 2.23
+
+{A,B,C} – {E,F}
+= min(7.07 , 7.07) = 7.07
+
+Matriz:
+
+              {A,B,C}     D      {E,F}
+{A,B,C}          -       5.00     7.07
+D                         -       2.23
+{E,F}                               -
+
+MÍNIMA GLOBAL = 2.23  (D - {E,F})
+
+--------------------------------------------------------
+PASO 8 — FUSIONAR D CON {E,F}
+--------------------------------------------------------
+
+{A,B,C}   {D,E,F}
+
+--------------------------------------------------------
+PASO 9 — ÚLTIMA DISTANCIA
+--------------------------------------------------------
+
+d({A,B,C} , {D,E,F})
+= min(5.00 , 7.07 , 7.07)
+= 5.00
+
+--------------------------------------------------------
+PASO 10 — FUSIÓN FINAL
+--------------------------------------------------------
+
+{A,B,C,D,E,F}
+
+ALGORITMO TERMINA
+========================================================
+
+```
+
+
+## Basado en densidades
+Algoritmo Paso a Paso 
+
+Para cada punto no visitado: Marcar como visitado. 
+
+Calcular su vecindad ε. 
+
+Si no tiene suficientes vecinos → marcar como ruido. 
+
+Si es núcleo → crear nuevo cluster. 
+
+Expandir cluster: 
+
+    Agregar todos sus vecinos.
+
+    Si alguno también es núcleo, agregar sus vecinos también.
+
+    Continuar hasta que no crezca más.
+    
+Eso genera clusters como regiones conectadas por densidad.
+
+```bash
+============================================================
+DBSCAN – EJEMPLO COMPLETO EN ASCII
+
+DATASET
+
+A = (1,1)
+B = (1.2,1.1)
+C = (0.8,1)
+D = (5,5)
+E = (5.2,5.1)
+F = (9,1)
+
+PARAMETROS
+
+eps = 0.5
+minPts = 3
+
+============================================================
+PASO 0 – INICIALIZACION
+
+Visitados = {}
+Clusters = []
+Ruido = []
+
+============================================================
+PASO 1 – PUNTO A
+
+Distancias desde A
+
+A-B = 0.22
+A-C = 0.20
+A-D = 5.66
+A-E = 5.94
+A-F = 8.00
+
+Vecindad(A) con eps=0.5
+
+N(A) = {A,B,C}
+
+|N(A)| = 3 >= minPts
+
+=> A es NUCLEO
+
+Crear Cluster 1
+
+Cluster 1 = {A}
+
+EXPANSION DESDE A
+
+Revisar B
+
+Distancias desde B
+
+B-A = 0.22
+B-C = 0.45
+
+N(B) = {A,B,C}
+|N(B)| = 3 >= 3
+
+=> B es NUCLEO
+
+Cluster 1 = {A,B}
+
+Revisar C
+
+Distancias desde C
+
+C-A = 0.20
+C-B = 0.45
+
+N(C) = {A,B,C}
+|N(C)| = 3 >= 3
+
+=> C es NUCLEO
+
+Cluster 1 = {A,B,C}
+
+No aparecen nuevos puntos
+Expansion termina
+
+Clusters = [ {A,B,C} ]
+
+Visitados = {A,B,C}
+
+============================================================
+PASO 2 – PUNTO D
+
+Distancias desde D
+
+D-E = 0.22
+D-A = 5.66
+D-B = 5.45
+D-C = 5.83
+D-F = 5.00
+
+N(D) = {D,E}
+|N(D)| = 2 < 3
+
+=> D NO es nucleo
+
+D = RUIDO
+
+Ruido = {D}
+
+Visitados = {A,B,C,D}
+
+============================================================
+PASO 3 – PUNTO E
+
+N(E) = {D,E}
+|N(E)| = 2 < 3
+
+=> E NO es nucleo
+
+E = RUIDO
+
+Ruido = {D,E}
+
+Visitados = {A,B,C,D,E}
+
+============================================================
+PASO 4 – PUNTO F
+
+N(F) = {F}
+|N(F)| = 1 < 3
+
+=> F NO es nucleo
+
+F = RUIDO
+
+Ruido = {D,E,F}
+
+Visitados = {A,B,C,D,E,F}
+
+============================================================
+RESULTADO FINAL
+
+CLUSTER 1:
+{A,B,C}
+
+RUIDO:
+{D,E,F}
+```
