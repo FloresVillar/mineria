@@ -1,4 +1,4 @@
-# Clustering 
+ # Clustering 
 ## **Basado en centroides**
 
 Se tienen **X={x1, x2, x3, ..,xn} xi e R^d** vamos a dividirlo en k cluster <br>
@@ -144,7 +144,7 @@ Es un mínimo global (la Hessiana = 2nI > 0).
 
 **Propiedades**
 
-funcionan bien si los cluster son esfericos , de tamaño similar, separables por distancia ecuclideana. <br>
+Funciona bien si los cluster son esfericos , de tamaño similar, separables por distancia ecuclideana. <br>
 Mal cuando hay formas no convexas, hay outliers, los cluster tienen densidades muy distintas
 
 **Variante importante : K-medoids**
@@ -156,7 +156,7 @@ En lugar del promedio , el centroide es un punto real del dataset. De modo que e
 K-means particiona el espacio en regiones tipo digrama de voronoi
 
 **complejidad**
-O(nkd)  n= puntos   k=cluster   d=dimension
+O(nkd) ,  n= puntos   k=cluster   d=dimension
 
 **EJEMPLO**
 
@@ -225,6 +225,122 @@ Garantiza el minimo local, no el global.
 
 
 ```
+Aunque sklearn lo tiene implementado mediante **from sklearn import KMeans** 
+
+```bash
+modelo = KMeans(n_clusters=4,n_init='auto')
+modelo.fit(X)  # realiza el calculo de los centroides, se entiende que llama a alguna funcion similar a kmeans() implementado
+y_clasificacion = modelo.predict(X)  # 0,1,2,0,.. el indice del cluster al cual pertenecen las filas(puntos ) en orden 
+centros = modelo.cluster_centers_  
+```
+Pero para un proceso de aprendizaje adecuado se implementara (en la medida de los posible y con el SOPORTE de gpt) la teoria en funciones claramente identificables.
+
+Comenzamos con la definicion de la distancia
+```bash
+def distancia (a,b): # son vectores [2,3..],[3,4..]
+    d = 0   
+    for j in range(len(a)):
+        d =+(a[i]-b[i])**2
+    return d 
+```
+Que es la distancia euclidea, luego abarcamos la parte mas extensa e interesante de k-means. 
+
+```bash
+def kmeans(x,K,N=1000)
+    n  = len(x)  # cantidad de filas (datos)
+    d = len(x[0])   # las columnas, dimension , x1,x2,x3...
+    for k in range(K):
+        centros.append(x[k].copy())      
+        #asignar k centroides arbitrariamente , el detalle para usar copy() es que asi se pierde la referencia (nombre distinto para el mismo ojeto )y se trabaja con un recurso nuevo.
+    asignaciones[0]*n   # es el objeto analogo a y_pred = modelo.predict(X) , contiene los indices de los cluster a los cuales pertenece la fila i (dato [x11,x12,...]) 
+```
+Definido los "atributos" , ahora se realiza la iteracion N veces , con una condicion de salida **conteo != True** es decir,los centroides no han cambiado (niguno de ellos) . Termina la iteracion.La teoria asegura que con los centroides estabilizados se minimiza J la distancia de los puntos a sus respectivos centroides.
+
+```bash
+    for it in range(N)      # todas las iteraciones
+        cambio = False      # bandera de salida
+```
+Luego para cada dato se analiza respecto a cada cluster 
+```bash
+    for i in range(n): # cada dato
+        cluster_cercano = None
+        mejor_distancia = None
+            for k in range(K): # cada centroide de los cada k-cluster
+                dis = distancia(x[i],centros[k])
+                si dis < _distancia: # debe pertenecer al cluster k
+                cluster_cercano = k
+                mejor_distancia = dis  # la menor distancia 
+            # una vez analizados el punto respecto a todos los k-clusters, asignar dicho punto al cluster mas cercano
+            if asignaciones[i]!=cluster_cercano:
+                cambio = True
+            asignaciones[i] = cluster_cercano
+
+```
+Una vez realizado el analisis para todos los datos, se tiene asignado dichos puntos a sus "mejores" cluster, a los cluster cuyo cuyos centroides son los mas cercanos a cada punto en cuestion
+
+Ahora creamos los nuevos centros (cada centro tiene una dimension d (x1,x2, .. ,xd)) y una cuenta para cada cada  cluster , de modo que cuentas[k] representa la cantidad de puntos que pertencen a dicho k cluster
+
+Entonces si la fila 2 esta asignado al cluster 0 X3 = [x0=2,x1=4] <br>
+nuevos_centros[ind_cluster=0][0] + X3[0]=2 <br>
+nuevos_centros[ind_cluster=0][1] +  X3[1]=4 <br>
+conteos[ind_cluster=0] ++ 
+
+Y si la fila (dato) 10 X11[0]=1 X11[1]=5 tambien esta asignado al cluster 0 <br>
+nuevos_centros[ind_cluster=0][0] + X11[0]=2 <br>
+nuevos_centros[ind_cluster=0][1] +  X11[1]=4 <br>
+conteos[ind_cluster=0] ++
+
+Entonces , estamos sumando las columnas j de las filas que pertenecen al cluster k
+
+Para luego promediar esos j de cada cluster k , esto dentro de nuevos_cluster donde cada fila [k][] es la referencia a cada cluster , y los elementos  j [k][j] son las coordenadas del centroide de la dimension j-esima , esto es nuevo_u1 , nuevo_u2, nuevo_u3 de cada cluster , desde luego se divide entre conteos[k] para que sea el promedio(centroide).
+
+```bash
+    nuevos_centros = []
+    conteos = []
+    for _ in range(K):
+        nuevos_centros.append([0]*d) # d columnas, dimension
+        conteos.append(0)
+    for i in range(n):
+        ind_asignaciones = asignaciones[i]
+        conteos[ind_asignaciones] +=1
+        for j in range(d):
+            nuevos_centros[ind_asignaciones][j]+=x[i][j] # las columnas posicion-j de cada fila como se explico antes
+    # para cada cluster con la suma de las nuevas coordenadas del cluster en cada dimension
+    for k in range(K):
+        if conteos[k]>0:
+            for k in range(d):
+                nuevo_cluster[k][j]/conteos[k]
+    # reasignamos los nuevos centros 
+    centros = []
+    for k in range(K):
+        centros.append(np.array(nuevos_centros[k]))
+    if not cambio: # convergio
+        break    
+```
+En este punto se tienen las asignaciones de todos los puntos a su respectivo cluster, aunque N es grande , la condicion if not cambio: asegura que se dio la convergencia, de acuerdo a la teoria generosamente facilitado por gpt
+
+Lo siguiente es mi codigo, para asignar los puntos al cluster . De modo que se tendra un diccionario con id  k del cluster, el centroide centros[k] y los puntos
+
+```bash
+    n = len(x)
+    for k in range(K):
+        puntos = [] 
+        for i in range(n):
+            if asginaciones[i] == k:
+                puntos.append(x[i])
+        puntos = np.array(puntos) # temas de sintaxis, pese a quee python presume de ser simple, estas pequeñeces sintacticas pueden provocar dolores de cabeza
+        if len(puntos)>0: # solo verificacion 
+            mi_cluster.append({INFO})
+```
+finalmente retornamos centros, asignaciones, cluster
+
+Ahora bien , el tema de los graficos son muy interesantes, mas que solo delegar la generacion de codigos  a gpt, lo que se intento fue codearlo por uno mismo pero siempre (en lugar de libros, foros ) con gpt como respaldo teorico.
+
+La funcion graficar_cluster(M, cluster) grafica para datos con 2 dimensiones como maxio, gpt sugiere que para dimensiones mayores se use pca
+
+obtenemos x,y = DATA[:,0] , DATA[:,1] que son las coordenadas matrices para los x,y
+dibujamos la grafica de dispersion via plt.scatter
+
 
 ## Clustering jerarquico
 
