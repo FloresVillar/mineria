@@ -668,9 +668,9 @@ Hecho esto se compara con la implementacion de sklearn.
     modelo = AgglomerativeClustering(n_clusters = 4, metric = 'euclidean' , linkage ='ward')
     y  = modelo.fit_predict(X)
     plt.scatter(X[:,0],X[:,1], c = y, s= 50, cmap = 'rainbow')
-
-    
 ```
+
+
 ## Basado en densidades
 Algoritmo Paso a Paso 
 
@@ -691,6 +691,51 @@ Expandir cluster:
     Continuar hasta que no crezca más.
     
 Eso genera clusters como regiones conectadas por densidad.
+
+Entonces clustering basado en densidad ,no buscamos grupos mas cercanos como en el cluster jerarquico sino donde hay suficiente concentracion de puntos
+
+Agrupamos regiones densas
+
+**Parametros**<br>   
+Se usaran 2 parametros RADIO DE LA VECINDAD, y MINPTS minima cantidad de puntos dentro del radio.
+
+Definiendo para cada xi , su vecindad **Ne(xi) = {xj : d(xi,xj)<=e}**
+
+Si |Ne(xi)>=minPts|   entonces xi es un punto  nucleo
+
+**tipos de puntos**<br>
+Nucleo, Border y Noise
+
+**Cluster**<br>
+Un cluster se forma conectando los puntos nucleo , donde cada paso esta a una distancia <= e
+
+Algunas diferencias con el jerarquico (y el kmeans) es quue puede dejar puntos sin agrupar considerandolos ruido   
+
+**consideraciones geometricas**<br>
+
+Si e es pequeño , muchos puntos seran considerados ruido
+
+Si e es grande, todo se une a un cluster inmenso
+
+Si minPts es alto, se requiere regiones muy densas
+
+**algoritmo**<br>
+- Para cada punto no visitado
+- Marcamos como visitado
+- Calculamos vecinos dentro de e
+- Si cantidad de puntos <minPts entonces es ruido
+
+- Caso contrario: crear un nuevo cluster, expandir agregando vecinos, repetir recursivamente
+
+Es como BFS sobre puntos nucleo
+```bash
+busco región local densa
+expando
+termino región
+busco otra región
+
+```
+
 
 ```bash
 ============================================================
@@ -836,3 +881,87 @@ CLUSTER 1:
 RUIDO:
 {D,E,F}
 ```
+
+Ahora el codigo <br>
+Se necesita (como siempre) la distancia, continuamos con la euclideana **def distancia(p,q)**
+
+Luego la funcion vecinos que analiza los vecinos de cada punto
+```bash
+def vecinos(datos,punto,e):
+    vecinos_ = []
+    for x in datos:
+        if distancia(punto,x) <= e:
+            vecinos_.append(x)
+    return vecinos_
+```
+
+Para la logica principal del algoritmo , visitamos el punto , agregando este a **visitados = set()**  , el detalle sintactico es el siguiente,  usamos  un conjunto pues esta implementado como una tabla hash.
+
+Hasheamos el elemento que queremos guardar (o recuperar) <br>
+Realizamos una division y el resto es el indice de nuestro elemento<br>
+Si el indice esta ocupado o el elemento del indice no es el buscado , se realizara **nuevo_indice = (indice_actual * 5 + 1 + perturbacion) % tamaño.** es como indica la teoria , direccionamiento abierto con sondeo cuadratico
+Bueno esa teoria lo dejo de lado (de momento) 
+
+Se usa un **set** pues se accede a sus elementos directamente
+
+En dbscan() para todos los puntos **p** marcamos como visitado (si no lo esta),  obtenemos sus vecinos 
+```bash
+    vecinos_ = vecinos(datos,punto,e)
+```
+Seguidamente se analiza la cantidad de vecinos no cumple con la condicion, si sucediera dicho escenario pues ese punto sera un ruido 
+
+```bash
+if len(vecinos_)<minPts:
+    ruido.append(punto)
+```
+Si se determina que no es ruido , se procede a la  creacion del cluster y la expansion del cluster.
+
+Se llama a **expandir_cluster**
+
+```bash
+    cluster = []
+    clusters.append(cluster)  # se agrega antes pues se realizaran modificaciones a ese cluster luego 
+    expandir_cluster(datos , punto, vecinos_,cluster,visitados, e,minPts)
+```
+ 
+Esto para cada punto respecto a si esta o no en visitados
+
+Ahora bien, en **expandir_cluster**
+
+Se añade el punto p al cluster, y para cada vecinos si vec(q) no esta en visitados (tuplas) se añade a a **visitados** ,   y nuevamente se analiza si los vecinos de q cumplen que minPts>CONDICION , para cada elemento de vecinos_q  se añade a vecinos_ (vecinos del punto p analizado)
+```bash
+    cluster.append(p)
+    for vec in vecinos_:
+        q = vec
+        if q not in visitados:
+            visitados.add(q)
+            vecinos_q = vecinos(q)
+            if |vecinos_q| > MINPTS:
+                for x in vecinos_q: 
+                    vecinos_.append(x) # solo si no esta ya 
+       
+```
+Seguidamente , ese punto q se añade al cluster 
+```bash
+ if q not in cluster:
+            cluster.append(q)
+```
+ 
+Hecho esto se prueba con distintos datos, y por supuesto , siempre es agradable graficar los resultados
+
+Geramos 70 filas de elementos normales , numeros gaussianos.
+
+```bash
+    for _ in range(30):
+        datos.append([random.gauss(2,0.5),random.gauss(2,0.5)])
+    .. los otros 30 con otra media y desviacion
+    .. los otros 10 con otra media y desviacion
+
+```
+Se tiene un objeto tipo list  con forma [ [], []] . De modo que para graficarlo no se usara datos[:,] sino 
+```bash
+    xs = [ p[0] for p in datos]
+    ys = [ p[1] for p in datos]
+    plt.scatter(xs,ys) 
+```
+
