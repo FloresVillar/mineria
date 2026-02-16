@@ -340,8 +340,52 @@ La funcion graficar_cluster(M, cluster) grafica para datos con 2 dimensiones com
 
 obtenemos x,y = DATA[:,0] , DATA[:,1] que son las coordenadas matrices para los x,y
 dibujamos la grafica de dispersion via plt.scatter
+pero estos son equivalentes a puntos[:,0],puntos[:,1] dentro del for
 
+Luego , pese a que los cluster no son "circulos" propiamente, por motivos didactivos lo dibujo de ese forma
+```bash
+    for c in clusters:
+        puntos = c["puntos"]
+        centro = c["centro"]
+        plt.scatter(puntos[:,0],puntos[:;1])
+        plt.scatter(centro[0],centro[1],marker='X')
+        ..
+```
+Para los puntos dentro del cluster **c**, se calcula las distancias de ese punto al CENTROIDE, nos quedamos con la mayor distancia que sera el radio, luego graficamos un circulo con CENTRO y radio
+```bash
+    radio = 0.0
+    for p in puntos:
+        dx = p[0] - centro[0]
+        dy = p[1] - centro[1]
+        d = (dx**2 + dy**2)**0.5
+        if d > radio:
+            radio = d
+    circulo = plt.Circle(TUPLA,radio,fill=False)   # fill False para solo colorear el borde, TUPLA = (centro[0],centro[1])
+    plt.gca()    # plt.gca() obtenemos los ejes actuales GET CURRENT AXES
+    plt.gca().add_patch(circulo) # con add_patch() añadimos a los ejes
 
+```
+Eso para cada punto que pertence a cada cluster.
+finalmente **plt.gca().set_aspect('equal')** para evitar deformaiones.
+
+Luego de PROBAR  el codigo y compararlo con la clase de sklearn 
+
+```bash
+    modelo = KMeans(n_clusters=4,n_init='auto')
+    modelo.fit(X)
+    y = modelo.predict(X)
+    centros = modelo.cluster_centers_
+    plt.scatter(X[:, 0], X[:, 1], c=y_kmeans, s=50, cmap='viridis')
+    plt.scatter(centros[:, 0], centros[:, 1], c='red', s=200, alpha=0.75, marker='X', label='Centroides')
+ 
+```
+Sin embargo como indica la teoria sklearn usa kmeans++ un algoritmo que elige los centroides inciales de forma mas coherente con los datos. 
+
+De modo que el primer centro se escoge aleatoriamente y los demas se escogen entre los puntos mas lejanos a  los k-centros anteriores
+
+```bash
+implementar despues
+```
 ## Clustering jerarquico
 
 ```bash
@@ -484,8 +528,149 @@ ALGORITMO TERMINA
 ========================================================
 
 ```
+El ejemplo anterior es muy detallado, se fusionan los clusters de menor distancia, y en la siguiente iteracion buscamos la distancia mas corta, si la distancia menor no se da entre un punto del cluster anterior fusionado y otro punto analizaddo, se fusionara (creando otro cluster) de modo que se tendran 2 clusters con mas de un elemento en cada cluster. Okay, se repite hasta obtener un unico Dendograma.
+
+Se usa la distancia euclideana, para ello la funcion dist(p,q)
+```bash
+def dist(p,q):
+    d = 0
+    for i in range(len(p)):
+        d+=(p[i]-q[i])**2
+```
+Ademas para cada para-cluster de calcula la minima distancia entre ellas , llamando a la funcion anterior cada vez que sea requiera
+
+```bash
+def d_cluster(cl1,cl2):
+    minima = float('inf')
+    for p in cl1:
+        for q in cl2:
+            d = dist(p,q)
+            if d < minima:
+                minima = d
+    return minima 
+```
+
+Con las funciones que calculan las distancias y la que determina la menor entre un par de cluster, nos embarcamos en la logica principal
+
+Comenzamos haciendo que cada dato(punto) sea un cluster
+```bash
+for i in range(n):
+    _clusters[i] = [datos[i]]  # un array en si mismo
+
+```
+Luego usamos **cluster_id = n** pues para implementar el concepto de dendograma(osea el dendograma mismo ) los indices corresponden a los puntos ,primero para los datos y luego incrementandose y asignandose al mismo tiempo a cada cluster,estto resultado de la fusion de los puntos de menor distancia
+
+n-indices (0,1→n-1) para los n puntos(datos) luego n indice del 1er(0) cluster formado, n+1 del sdo(1) cluster formado  y asi en adelante
+
+```bash
+cluster_id = len(datos)
+```
+
+Como se indica antes, el algoritmo es "recursivo" mientras no se tenga un unico cluster **len(_cluster)>1** . Esto resulta pues cada vez que se hace la fusion se eliminan los cluster(puntos) anteriores **_cluster.pop(indice del cluster)**
+
+```bash
+while len(_clusters)>1:
+    mejor_distancia 
+    mejor_i
+    mejor_j
+    ids = list(_clusters.keys()) # _clusters es un {} para obtener sus indices usamos keys() , estos indices no consecutivos 0,1,2..  sino 4,5,6.. por el tipo de eliminacion antes señalada
+```
+
+Ahora dentro de este bucle se realiza en analisis cluster vs cluster , comparando el cluster i vs los i+1, i+2....clusters
+```bash
+Matriz reducida:
+
+            {A,B}     C      D      E      F
+{A,B}         -      1.41   5.00   7.07   7.21
+C                     -      5.00   7.21   7.07
+D                            -      2.23   2.23
+E                                   -      1.41
+F
+```
+```bash
+    for i in range(len(ids)):
+        for j in range(i+1,len(ids)):
+            d = d_cluster(cl1,cl2) # distancia entre cluster , recordad que d_cluster llama a distancia para cada punto que pertenezca al cluster, obteniendo el minimo
+
+            # luego se obtienen los indices de los cluster con la menor distancia
+            if d < mejor_distancia:
+                mejor_distancia = d
+                mejor_i = ids[i]
+                mejor_j = ids[j]
+
+```
+Ahora bien , concatenamos los cluster con la menor distancia
+
+```bash
+        nuevo_cluster  = _clusters[mejor_i] + _clusters[mejor_j]
+        if mejor_i > mejor_j:
+            _clusters.pop(mejor_i)
+            _clusters.pop(mejor_j)
+            ...
+    # y asignamos al indices cluster_id de _clusters el nuevo_cluster
+    _cluster[cluster_id] = nuevo_cluster
+    cluster_id =+1
+```
+
+Ahora bien , una vez obtenido el dendograma logico pasamos a graficarlo
+
+De acuerdo con la teoria no se va a graficar los puntos originales, sino su posicion de acuerdo a los indices de los puntos , en el nivel de las hojas, y los puntos medios de los cluster que forman la union , todo esto en el eje de las abscisas. Y para el eje de las ordenadas la distancia d calculado anteriormente.
+
+```bash
+x = {}                    #indices
+for i in range(n):
+    x[i] = i
+altura = {}               # ordenadas
+for cluster in clusters:  # para todos los clusters
+    d = cluster["d"]
+    i = cluster["i"]
+    j = cluster["j"]
+    id_ = cluter["id"]
+    x1 = x[i]
+    x2 = x[j]
+    y1 = altura[i] is i in altura else 0
+    y2 = altura[j] is j in altura else 0
+    plt.plot([x1,x1],[y1,d])   # el punto (x1,x1) se une verticalmente con el punto (y1,d)
+    plt.plot([x2,x2],[y2,d]) # lo mismo
+    plt.plot([x1,x2],[d,d]) # la recta horizontal a la altura d en la cual se realizo la fusion 
+    #para la coordenada del cluster fusion se promedia (x1 + x2) /2
+    x[id_] = (x1 + x2)/2
+    altura[id_] = d
+```
+Se grafican A,B como hojas. luego en la siguiente iteracion, si el x[i] es el cluster fusionado el punto se grafica en (x1+x2)/2 y la altura es d, luego se realiza el analisis para el otro punto que forma el (se entiende) nuevo cluster.
+
+```bash
+     -------------------
+          |                 
+        (ABC)             
+          |                
+         1.41              
+      ---------         
+      |       |         
+    (AB)      C          
+      |                             
+     1.41                          
+   ------                          
+   |    |                           
+   A    B                           
+```
 
 
+Hecho esto se compara con la implementacion de sklearn. 
+
+```bash
+    import scipy.cluster.hierarchy as sch
+
+    X,_ = make_blobs(n_samples = 300,centers = 4, cluster_std = 0.60, random_state = 0)
+    plt.figure(figsize(10,5))
+    dendogram = sch.dendogram(sch.linkage(x,method='ward'))
+    
+    modelo = AgglomerativeClustering(n_clusters = 4, metric = 'euclidean' , linkage ='ward')
+    y  = modelo.fit_predict(X)
+    plt.scatter(X[:,0],X[:,1], c = y, s= 50, cmap = 'rainbow')
+
+    
+```
 ## Basado en densidades
 Algoritmo Paso a Paso 
 
