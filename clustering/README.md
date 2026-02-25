@@ -965,3 +965,4 @@ Se tiene un objeto tipo list  con forma [ [], []] . De modo que para graficarlo 
     plt.scatter(xs,ys) 
 ```
 
+
