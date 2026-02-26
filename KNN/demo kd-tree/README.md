@@ -286,3 +286,7 @@ función buscar(nodo, consulta, profundidad=0, mejor=null):
 ```
 
 
+**codigo final**
+
+En el cuaderno jupyter, aun falta documentar la teoria , pese a tener comentarios escuetos al derecho de las lineas
+
