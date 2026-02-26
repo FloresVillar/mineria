@@ -144,5 +144,97 @@ Nivel 3:    (4,7) (2,8)  (6,1) (9,2)  (5,3) (7,6)
 - Busqueda
 
 ```bash
+p  = (6,5)  k =1  # punto y vecino de consulta
 
+#Paso 1: 
+
+Bola_0
+d_centroide = dist((6,5), (4.86,4.43))  = 1.28
+
+dmin = 1.28 - radio(4.8) = -3.52 < 0 
+# se explora
+
+¿que hijo primero? el mas cercano
+d_centroide Bola_izq = dist((6,5),(2.33,6.33)) = 3.90
+d_centroide Bola_der = dist((6,5),(6.75,3.0))  = 2.14
+
+2.14 < 3.90 explorar 
+
+#PASO 2  
+
+Bola_der 
+Paso 2: Bola_der c=(6.75,3.0) r=3.01
+d_centroide = 2.14
+minima_posible = 2.14 - 3.01 = -0.87
+Negativo → dentro de la bola → exploramos.
+¿Qué hijo primero?
+d_centroide Bola_der_der = dist((6,5),(6.0,4.5)) = 0.50
+d_centroide Bola_der_izq = dist((6,5),(7.5,1.5)) = 3.81
+0.50 < 3.81 → exploramos Bola_der_der primero
+
+#Paso 3:
+
+Bola_der_der c=(6.0,4.5) r=1.80
+d_centroide = 0.50
+minima_posible = 0.50 - 1.80 = -1.30
+Dentro → exploramos ambas hojas:
+Hoja (7,6):
+d = dist((6,5),(7,6)) = sqrt(1+1) = 1.41
+Candidato: (7,6) = 1.41
+Hoja (5,3):
+d = dist((6,5),(5,3)) = sqrt(1+4) = 2.24
+2.24 > 1.41 → no mejora
+
+#paso 4
+
+Paso 4: Bola_der_izq c=(7.5,1.5) r=1.58
+d_centroide = 3.81
+minima_posible = 3.81 - 1.58 = 2.23
+peor candidato = 1.41
+
+2.23 >= 1.41 → PODAMOS toda la bola
+
+
+#Paso 5:
+
+Bola_izq c=(2.33,6.33) r=2.69
+d_centroide = 3.90
+minima_posible = 3.90 - 2.69 = 1.21
+peor candidato = 1.41
+
+1.21 >= 1.41 ? False → exploramos
+¿Qué hijo primero?
+d hoja (1,4)         = dist((6,5),(1,4))   = 5.10
+d Bola_izq_der c=(3,7.5) = dist((6,5),(3,7.5)) = 3.91
+3.91 < 5.10 → exploramos Bola_izq_der primero
+
+#Paso 6:
+
+Bola_izq_der c=(3.0,7.5) r=1.12
+d_centroide = 3.91
+minima_posible = 3.91 - 1.12 = 2.79
+peor candidato = 1.41
+
+2.79 >= 1.41 → PODAMOS (4,7) y (2,8)
+
+#Paso 7:
+
+Hoja (1,4)
+d = dist((6,5),(1,4)) = sqrt(25+1) = 5.10
+5.10 > 1.41 → no mejora
+
+#resultado 
+Nivel 0:        Bola_0 ✓ visitada
+                /      \
+Nivel 1:   Bola_izq✓   Bola_der✓
+            /    \       /       \
+Nivel 2: (1,4)✓ Bola_izq_der✗  Bola_der_izq✗  Bola_der_der✓
+                  PODADA          PODADA
+                  /   \           /    \          /    \
+Nivel 3:       (4,7) (2,8)     (6,1) (9,2)    ✓(7,6) ✗(5,3)
+               podados          podados        1.41
+
+
+Visitados: Bola_0, Bola_der, Bola_der_der, (7,6), (5,3), Bola_der_izq, Bola_izq, Bola_izq_der, (1,4)
+Podados:   (6,1), (9,2), (4,7), (2,8)  → 4 puntos nunca evaluados
 ```
