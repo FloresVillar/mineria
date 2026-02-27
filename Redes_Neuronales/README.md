@@ -6,6 +6,8 @@
     # Backpropagation — Teoría completa + ejemplo numérico en ASCII
 
 X=[1,0]   y=1   lr=0.5
+            
+            z1 → a1 → z2 → a2 → L
 
 W1=[[0.5,-0.3],[0.4,0.6]]   b1=[0.1,0.2]
 W2=[[0.7],[-0.5]]            b2=[-0.3]
