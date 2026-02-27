@@ -238,3 +238,4 @@ Nivel 3:       (4,7) (2,8)     (6,1) (9,2)    ✓(7,6) ✗(5,3)
 Visitados: Bola_0, Bola_der, Bola_der_der, (7,6), (5,3), Bola_der_izq, Bola_izq, Bola_izq_der, (1,4)
 Podados:   (6,1), (9,2), (4,7), (2,8)  → 4 puntos nunca evaluados
 ```
+*falta documentar el codigo*
