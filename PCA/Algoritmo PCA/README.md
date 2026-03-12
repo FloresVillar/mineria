@@ -334,20 +334,23 @@ Preserva estructura topologica local
 ### comparacion 
 
 ```bash
-| Aspecto                                 | PCA                    | LDA                               | UMAP                                  |
-| --------------------------------------- | ---------------------- | --------------------------------- | ------------------------------------- |
-| Tipo                                    | No supervisado         | Supervisado                       | No supervisado                        |
-| Naturaleza                              | Lineal                 | Lineal                            | No lineal                             |
-| Objetivo matemático                     | Maximizar varianza     | Maximizar separación entre clases | Preservar estructura topológica local |
-| Usa etiquetas                           | ❌ No                   | ✅ Sí                              | ❌ No                                  |
-| Qué preserva                            | Varianza global        | Separación entre clases           | Vecindades locales                    |
-| Modelo explícito                        | Sí (proyección lineal) | Sí (proyección lineal)            | No (embedding aprendido)              |
-| Transformación aplicable a nuevos datos | Sí                     | Sí                                | Sí (si guardas modelo)                |
-| Interpretable                           | Alta                   | Media                             | Baja                                  |
-| Escala bien a muchos datos              | Sí                     | Sí                                | Sí (mejor que t-SNE)                  |
-| Mantiene estructura global              | Sí (lineal)            | Parcial                           | Mejor que t-SNE                       |
-| Detecta manifolds curvos                | ❌ No                   | ❌ No                              | ✅ Sí                                  |
-| Sensible a ruido                        | Sí                     | Sí                                | Moderado                              |
-| Parámetros clave                        | n_components           | n_components                      | n_neighbors, min_dist                 |
+| Aspecto                    | PCA                | LDA                                  | t-SNE                              | UMAP                                 |
+| -------------------------- | ------------------ | ------------------------------------ | ---------------------------------- | ------------------------------------ |
+| Tipo                       | No supervisado     | Supervisado                          | No supervisado                     | No supervisado                       |
+| Lineal / No lineal         | Lineal             | Lineal                               | No lineal                          | No lineal                            |
+| Usa etiquetas              | ❌                  | ✅                                    | ❌                                  | ❌                                    |
+| Qué preserva               | Varianza global    | Separación entre clases              | Vecindades locales probabilísticas | Estructura topológica local          |
+| Función objetivo           | Maximizar varianza | Maximizar razón entre / intra clases | Minimizar KL(P‖Q)                  | Minimizar cross-entropy entre grafos |
+| Interpretable              | Alta               | Media                                | Baja                               | Baja                                 |
+| Ejes con significado       | Sí                 | Sí                                   | No                                 | No                                   |
+| Detecta manifolds curvos   | ❌                  | ❌                                    | ✅                                  | ✅                                    |
+| Preserva estructura global | Parcial            | Parcial                              | ❌ (malo en global)                 | Mejor que t-SNE                      |
+| Escala a grandes datos     | Muy bien           | Muy bien                             | Regular (lento)                    | Muy bien                             |
+| Aplicable a nuevos datos   | Sí                 | Sí                                   | No trivial                         | Sí                                   |
+| Parámetros clave           | n_components       | n_components                         | perplexity, lr                     | n_neighbors, min_dist                |
 
 ```
+
+<p align="center">
+    <img src="imagenes/comparacion.png" >
+</p>
